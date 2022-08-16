@@ -1,0 +1,101 @@
+ <div class="table-responsive checkout-content default" style="position: relative">
+                        <table id="cart" class="table table-striped">
+                            <thead>
+                               <tr>
+                                   <td>„Õ’Ê·</td>
+                                   <td>ﬁÌ„ </td>
+                                   <td> ⁄œ«œ</td>
+                                   <td>Ã„⁄ ò·</td>
+                                   <td></td>
+                               </tr>
+                            </thead>
+                            <tbody>
+                            @php $total =0 @endphp
+                            @if(auth()->check())
+                                @foreach($carts as $cart)
+                                    @php
+                                        $products=\Illuminate\Support\Facades\DB::table('products')->where('id',$cart->product_id)->first();
+                                         $isBasket=$cart->basket_id;
+                                         $isBasket=\Illuminate\Support\Facades\DB::table('baskets')->where('id',$isBasket)->where('isActive',1)->first();
+                                    @endphp
+                                    @if(isset($isBasket))
+                                        <tr class="checkout-item">
+                                            @php
+                                                $total+= $cart->quantity == 1 ? $products->price : $cart->quantity * $products->price;
+                                                //$qty=\Illuminate\Support\Facades\DB::table("carts")->where('status',1)->where('user_id',auth()->user()->id)->get()->sum("quantity");
+                                                $gallery=\App\Models\Gallery::where('product_id',$products->id)->first();
+
+                                            @endphp
+
+                                            <td data-th="Product">
+                                                <div class="row">
+                                                    <div class="col-sm-3 hidden-xs">
+                                                        <img src="\{{ $gallery->img }}"  class="img-responsive"/>
+                                                    </div>
+                                                    <div class="col-sm-9">
+                                                        <h4 class="nomargin" style="display: inline-block">{{ $products->title }}</h4>
+                                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;—‰ê <span>{{ $cart->values->value }}</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                            <td data-th="Price">{{ number_format($products->price) }}  Ê„«‰</td>
+                                            <td data-th="Quantity">
+                                                <div class="qty">
+                                                    <input type="number" value="{{ $cart->quantity }}" id="" min="1" step="1" class=" quantity update-cart" />
+                                                </div>
+                                            </td>
+                                            <td data-th="Subtotal" class="text-center"> Ê„«‰{{ number_format($products->price * $cart->quantity) }}</td>
+                                            <td class="actions" data-th="">
+                                                <button class="btn btn-danger btn-sm remove-from-cart"><i class="fa fa-trash-o"></i></button>
+                                            </td>
+
+                                        </tr>
+                                    @endif
+                                @endforeach
+                            @endif
+                            @if(session('cart'))
+                                @foreach(session('cart') as $id => $details)
+                                    @php $total += $details['price'] * $details['quantity'] @endphp
+                                    <tr data-id="{{ $id }}">
+                                        <td data-th="Product">
+                                            <div class="row">
+                                                <div class="col-sm-3 hidden-xs">
+                                                    <img src="{{ $details['img'] }}"  class="img-responsive"/></div>
+                                                <div class="col-sm-9">
+                                                    <h4 class="nomargin" style="display: inline-block">{{ $details['title'] }}</h4>
+                                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;—‰ê <span>{{ $details['values'] }}</span>
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                        <td data-th="Price">{{ number_format($details['price']) }}  Ê„«‰</td>
+                                        <td data-th="Quantity">
+                                            <div class="qty">
+                                            <input type="number" value="{{ $details['quantity'] }}" id="" min="1" step="1" class=" quantity update-cart" />
+                                            </div>
+                                        </td>
+                                        <td data-th="Subtotal" class="text-center"> Ê„«‰{{ number_format($details['price'] * $details['quantity']) }}</td>
+                                        <td class="actions" data-th="">
+                                            <button class="btn btn-danger btn-sm remove-from-cart"><i class="fa fa-trash-o"></i></button>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                                @else
+                                <div class="txtmessage">
+                                    ”»œ Œ—Ìœ ‘„« Œ«·Ì „Ì »«‘œ
+                                </div>
+                            @endif
+                            </tbody>
+                            <tfoot>
+                            <tr>
+                                <td colspan="5" class="text-right"><h3><strong>„»·€ ò· {{ number_format($total) }}  Ê„«‰</strong></h3></td>
+                            </tr>
+                            <tr>
+                                <td colspan="5" class="text-right">
+                                    <a href="{{ url('/') }}" class="btn btn-info" style="background: #00bfd6"><i class="fa fa-angle-left"></i> »«“ê‘  »Â ›—Ê‘ê«Â</a>
+                                </td>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
